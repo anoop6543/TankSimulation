@@ -36,7 +36,7 @@ python TankSimulation_Live_Improved.py
 - **Simulate Sensor Failure**: Simulates a sensor malfunction
 
 ## Visualization
-![Two-Tank System Simulation](simulation_screenshot.png)
+![Two-Tank System Simulation](simulation_results.png)
 
 ## Contributing
 Contributions to improve the simulation are welcome. Please follow these steps:
