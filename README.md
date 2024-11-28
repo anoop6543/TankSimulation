@@ -3,12 +3,16 @@
 ## Description
 This project simulates a two-tank system with real-time visualization and interactive controls. It models two tanks with different filling rates and control mechanisms, providing a graphical interface to observe changing water levels over time. The simulation includes features such as power loss simulation, sensor failure scenarios, and audible alarms for critical tank levels.
 
+The system now incorporates advanced control algorithms, allowing users to select between PID (Proportional-Integral-Derivative), MPC (Model Predictive Control), and Fuzzy Logic control methods. This enhancement provides a more realistic and flexible simulation environment for studying different control strategies in fluid management systems.
+
 ## Features
 - Real-time visualization of tank levels
 - Interactive controls for power loss and sensor failure simulation
 - Audible alarms for critical tank levels (90%, 95%, 100%)
 - Fail-safe mechanisms to prevent overflow
 - Customizable tank parameters and control logic
+- Selectable control algorithms: PID, MPC, and Fuzzy Logic
+- Data logging and export functionality
 
 ## Installation
 
@@ -26,14 +30,13 @@ This project simulates a two-tank system with real-time visualization and intera
 
 
 ## Usage
-Run the simulation:
-
-python TankSimulation_Live_Improved.py
+Run the simulation: `python TankSimulation_Live_Improved.py`
 
 ## Controls
-- **Stop Simulation**: Ends the simulation and closes the application
-- **Simulate Power Loss**: Toggles power on/off in the system
-- **Simulate Sensor Failure**: Simulates a sensor malfunction
+- Select control algorithm before starting the simulation
+- Start/Stop Water Flow and Drain
+- Simulate Power Loss and Sensor Failure
+- Stop Simulation and export data
 
 ## Visualization
 ![Two-Tank System Simulation](simulation_results.png)

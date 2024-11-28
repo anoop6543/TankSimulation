@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QLabel
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QLabel, QComboBox
 from PyQt5.QtCore import QTimer
 from PyQt5.QtMultimedia import QSound
 from PyQt5.QtCore import QUrl
@@ -73,7 +73,16 @@ class TankSimulation(QMainWindow):
         self.setup_logger()
         logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
         self.logger = logging.getLogger('TankSimulation')
+        self.control_algorithm = "PID"  # Default to PID
+        self.algorithm_selector = QComboBox()
+        self.algorithm_selector.addItems(["PID", "MPC", "Fuzzy Logic"])
+        self.algorithm_selector.currentTextChanged.connect(self.set_control_algorithm)
+        button_layout.addWidget(self.algorithm_selector)
 
+
+    def set_control_algorithm(self, algorithm):
+        self.control_algorithm = algorithm
+        self.status_label.setText(f"Control Algorithm set to: {algorithm}")
 
     def setup_logger(self):
         self.logger = logging.getLogger('TankSimulation')
@@ -148,13 +157,23 @@ class TankSimulation(QMainWindow):
 
         if self.sensor_working:
             if self.water_flow:
-                control1, self.integral1, self.prev_error1 = self.pid_control(self.level1, self.setpoint1, self.integral1, self.prev_error1)
-                control2, self.integral2, self.prev_error2 = self.pid_control(self.level2, self.setpoint2, self.integral2, self.prev_error2)
+                if self.control_algorithm == "PID":
+                    control1, control2 = self.pid_control()
+                elif self.control_algorithm == "MPC":
+                    control1, control2 = self.mpc_control()
+                elif self.control_algorithm == "Fuzzy Logic":
+                    control1, control2 = self.fuzzy_control()
+                
+                # control1, self.integral1, self.prev_error1 = self.pid_control(self.level1, self.setpoint1, self.integral1, self.prev_error1)
+                # control2, self.integral2, self.prev_error2 = self.pid_control(self.level2, self.setpoint2, self.integral2, self.prev_error2)
+
                 self.level1 = min(self.level1 + control1 * time_step, self.tank1_max)
                 self.level2 = min(self.level2 + control2 * time_step, self.tank2_max)
+
             if self.water_drain:
                 drain_rate1 = self.calculate_control(self.level1, 30, 80, 90, 95, is_draining=True)
                 drain_rate2 = self.calculate_control(self.level2, 20, 80, 90, 95, is_draining=True)
+
                 self.level1 = max(self.level1 - 0.5 * time_step, 0)  # Constant drain rate
                 self.level2 = max(self.level2 - 0.5 * time_step, 0)
         else:
@@ -216,6 +235,20 @@ class TankSimulation(QMainWindow):
     def set_setpoints(self, setpoint1, setpoint2):
         self.setpoint1 = setpoint1
         self.setpoint2 = setpoint2
+
+    def mpc_control(self):
+       # Simplified MPC control
+        control1 = max(0, min(1, (self.setpoint1 - self.level1) * 0.1))
+        control2 = max(0, min(1, (self.setpoint2 - self.level2) * 0.1))
+        return control1, control2
+
+    def fuzzy_control(self):
+        # Simplified Fuzzy Logic control
+        error1 = self.setpoint1 - self.level1
+        error2 = self.setpoint2 - self.level2
+        control1 = max(0, min(1, error1 * 0.2))
+        control2 = max(0, min(1, error2 * 0.2))
+        return control1, control2
 
     def check_overflow(self):
         if self.level1 >= self.tank1_max or self.level2 >= self.tank2_max:
