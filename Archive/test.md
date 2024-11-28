@@ -4,12 +4,7 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtMultimedia import QSound
 from PyQt5.QtCore import QUrl
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
-from datetime import datetime
 import pyqtgraph as pg
-import logging
-import csv
-import matplotlib.pyplot as plt
-
 
 
 class TankSimulation(QMainWindow):
@@ -70,18 +65,6 @@ class TankSimulation(QMainWindow):
         self.initialize_simulation()
         self.setup_plot()
         self.setup_sounds()
-        self.setup_logger()
-        logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
-        self.logger = logging.getLogger('TankSimulation')
-
-
-    def setup_logger(self):
-        self.logger = logging.getLogger('TankSimulation')
-        self.logger.setLevel(logging.INFO)
-        handler = logging.FileHandler('tank_simulation.log')
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-        handler.setFormatter(formatter)
-        self.logger.addHandler(handler)
 
     def initialize_simulation(self):
         self.tank1_max = 100
@@ -130,17 +113,16 @@ class TankSimulation(QMainWindow):
         time_step = 0.1
         self.time += time_step
 
+        control1 = self.calculate_control(self.level1, 30, 80, 90, 95)
+        control2 = self.calculate_control(self.level2, 20, 80, 90, 95)
+
         if self.sensor_working:
             if self.water_flow:
-                control1 = self.calculate_control(self.level1, 30, 80, 90, 95)
-                control2 = self.calculate_control(self.level2, 20, 80, 90, 95)
                 self.level1 = min(self.level1 + control1 * time_step, self.tank1_max)
                 self.level2 = min(self.level2 + control2 * time_step, self.tank2_max)
             if self.water_drain:
-                drain_rate1 = self.calculate_control(self.level1, 30, 80, 90, 95, is_draining=True)
-                drain_rate2 = self.calculate_control(self.level2, 20, 80, 90, 95, is_draining=True)
-                self.level1 = max(self.level1 - drain_rate1 * time_step, 0)
-                self.level2 = max(self.level2 - drain_rate2 * time_step, 0)
+                self.level1 = max(self.level1 - control1 * time_step, 0)
+                self.level2 = max(self.level2 - control2 * time_step, 0)
         else:
             self.status_label.setText("System Status: Sensor Failure")
 
@@ -155,32 +137,7 @@ class TankSimulation(QMainWindow):
         self.curve1.setData(self.times, self.levels1)
         self.curve2.setData(self.times, self.levels2)
 
-        if self.level1 >= 30 and self.prev_level1 < 30:
-            self.logger.info("Tank 1 reached 30% level")
-        if self.level2 >= 20 and self.prev_level2 < 20:
-            self.logger.info("Tank 2 reached 20% level")
-    
-        if self.level1 >= 80 and self.prev_level1 < 80:
-            self.logger.info("Tank 1 reached 80% level")
-        if self.level2 >= 80 and self.prev_level2 < 80:
-            self.logger.info("Tank 2 reached 80% level")
-    
-        if self.level1 >= 90 and self.prev_level1 < 90:
-            self.logger.info("Tank 1 reached 90% level")
-        if self.level2 >= 90 and self.prev_level2 < 90:
-            self.logger.info("Tank 2 reached 90% level")
-    
-        if self.level1 >= 95 and self.prev_level1 < 95:
-            self.logger.info("Tank 1 reached 95% level")
-        if self.level2 >= 95 and self.prev_level2 < 95:
-            self.logger.info("Tank 2 reached 95% level")
-    
-        self.prev_level1 = self.level1
-        self.prev_level2 = self.level2
-
-    def calculate_control(self, level, start_fill, slow_down1, slow_down2, stop_fill, is_draining=False):
-        if is_draining:
-            return 0.5  # Constant drain rate
+    def calculate_control(self, level, start_fill, slow_down1, slow_down2, stop_fill):
         if level < start_fill:
             return 1
         elif start_fill <= level < slow_down1:
@@ -210,72 +167,37 @@ class TankSimulation(QMainWindow):
 
     def stop_simulation(self):
         self.timer.stop()
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"simulation_data_{timestamp}.csv"
-        self.logger.info("Simulation stopped")
-    
-        # Save data as CSV
-        with open(filename, 'w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(['Time', 'Tank1 Level', 'Tank2 Level'])
-            for t, l1, l2 in zip(self.times, self.levels1, self.levels2):
-                writer.writerow([t, l1, l2])
-        
-        self.status_label.setText(f"Simulation stopped. Data saved to {filename}")
-
-        # Save plot as image
-        plt.figure(figsize=(10, 6))
-        plt.plot(self.times, self.levels1, label='Tank 1')
-        plt.plot(self.times, self.levels2, label='Tank 2')
-        plt.xlabel('Time (s)')
-        plt.ylabel('Level (%)')
-        plt.title('Tank Simulation Results')
-        plt.legend()
-        plt.savefig('simulation_results.png')
         self.close()
 
     def simulate_power_loss(self):
         self.power_on = not self.power_on
         if self.power_on:
             self.status_label.setText("System Status: Power Restored")
-            self.logger.info("Power restored")
-
         else:
             self.status_label.setText("System Status: Power Loss")
-            self.logger.warning("Power loss")
 
     def simulate_sensor_failure(self):
         self.sensor_working = not self.sensor_working
         if self.sensor_working:
             self.status_label.setText("System Status: Sensors Restored")
-            self.logger.info("Sensors restored")
-
         else:
             self.status_label.setText("System Status: Sensor Failure")
-            self.logger.warning("Sensor failure occurred")
 
     def start_water_flow(self):
         self.water_flow = True
         self.status_label.setText("System Status: Water Flow Started")
-        self.logger.info("Water flow started")
 
     def stop_water_flow(self):
         self.water_flow = False
         self.status_label.setText("System Status: Water Flow Stopped")
-        self.logger.info("Water flow stopped")
-
 
     def start_water_drain(self):
         self.water_drain = True
         self.status_label.setText("System Status: Water Drain Started")
-        self.logger.info("Water drain started")
-
 
     def stop_water_drain(self):
         self.water_drain = False
         self.status_label.setText("System Status: Water Drain Stopped")
-        self.logger.info("Water drain stopped")
-
 
 
 if __name__ == '__main__':

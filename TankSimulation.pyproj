@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>3bede2da-6731-4d0f-ac45-d724b0edb5ce</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>TankSimulation.py</StartupFile>
+    <StartupFile>Archive\TankSimulation.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,10 +21,16 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="audiofiltest.py" />
-    <Compile Include="TankSimulation.py" />
-    <Compile Include="TankSimulation_Live.py" />
+    <Compile Include="Archive\audiofiltest.py" />
+    <Compile Include="Archive\TankSimulation.py" />
+    <Compile Include="Archive\TankSimulation_Live.py" />
     <Compile Include="TankSimulation_Live_Improved.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Archive\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Archive\test.md" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

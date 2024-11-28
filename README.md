@@ -20,7 +20,7 @@ This project simulates a two-tank system with real-time visualization and intera
 
 ### Setup
 1. Clone the repository:
-      git clone https://github.com/anoop6543/two-tank-simulation.git
+      git clone https://github.com/anoop6543/tanksimulation.git
 2. Navigate to the project directory:
 * pip install PyQt5 pyqtgraph numpy
 
@@ -52,4 +52,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ## Contact
 Your Name - [@anp_ner](https://twitter.com/anp_ner_) - anoop6543@gmail.com
 
-Project Link: [https://github.com/anoop6543/two-tank-simulation](https://github.com/anoop6543/two-tank-simulation)
+Project Link: [https://github.com/anoop6543/TankSimulation](https://github.com/anoop6543/TankSimulation)

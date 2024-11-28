@@ -1,6 +1,3 @@
-# You're absolutely right. Adding documentation and comments is crucial for code readability and maintainability. Here's the improved version of the program with comprehensive comments and docstrings:
-
-# ```python
 import sys
 import numpy as np
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton
@@ -154,18 +151,3 @@ if __name__ == '__main__':
     sim = TankSimulation()
     sim.show()
     sys.exit(app.exec_())
-# ```
-
-# This updated version includes:
-
-# 1. **Docstrings**: Each class and method now has a docstring explaining its purpose and functionality.
-
-# 2. **Inline Comments**: Key sections of the code are explained with inline comments.
-
-# 3. **Improved Method Structure**: The control logic has been moved to a separate method `calculate_control()` for better organization and reusability.
-
-# 4. **Descriptive Variable Names**: Variable names have been chosen to be self-explanatory.
-
-# 5. **Consistent Formatting**: The code follows consistent indentation and spacing for improved readability.
-
-# These additions make the code more understandable and maintainable, which is especially important for complex simulations like this two-tank system. The documentation will help other developers (or yourself in the future) to quickly understand the purpose and functionality of each part of the program.
