@@ -96,6 +96,22 @@ class TankSimulation(QMainWindow):
         self.sensor_working = True
         self.water_flow = False
         self.water_drain = False
+        self.setpoint1 = 50  # Desired level for tank 1
+        self.setpoint2 = 50  # Desired level for tank 2
+        self.Kp = 0.5  # Proportional gain
+        self.Ki = 0.1  # Integral gain
+        self.Kd = 0.05  # Derivative gain
+        self.integral1 = 0
+        self.integral2 = 0
+        self.prev_error1 = 0
+        self.prev_error2 = 0
+
+    def pid_control(self, level, setpoint, integral, prev_error):
+        error = setpoint - level
+        integral += error * 0.1  # Assuming 0.1 second time step
+        derivative = (error - prev_error) / 0.1
+        output = self.Kp * error + self.Ki * integral + self.Kd * derivative
+        return max(0, min(1, output)), integral, error
 
     def setup_plot(self):
         self.plot_widget.setBackground('w')
@@ -132,15 +148,15 @@ class TankSimulation(QMainWindow):
 
         if self.sensor_working:
             if self.water_flow:
-                control1 = self.calculate_control(self.level1, 30, 80, 90, 95)
-                control2 = self.calculate_control(self.level2, 20, 80, 90, 95)
+                control1, self.integral1, self.prev_error1 = self.pid_control(self.level1, self.setpoint1, self.integral1, self.prev_error1)
+                control2, self.integral2, self.prev_error2 = self.pid_control(self.level2, self.setpoint2, self.integral2, self.prev_error2)
                 self.level1 = min(self.level1 + control1 * time_step, self.tank1_max)
                 self.level2 = min(self.level2 + control2 * time_step, self.tank2_max)
             if self.water_drain:
                 drain_rate1 = self.calculate_control(self.level1, 30, 80, 90, 95, is_draining=True)
                 drain_rate2 = self.calculate_control(self.level2, 20, 80, 90, 95, is_draining=True)
-                self.level1 = max(self.level1 - drain_rate1 * time_step, 0)
-                self.level2 = max(self.level2 - drain_rate2 * time_step, 0)
+                self.level1 = max(self.level1 - 0.5 * time_step, 0)  # Constant drain rate
+                self.level2 = max(self.level2 - 0.5 * time_step, 0)
         else:
             self.status_label.setText("System Status: Sensor Failure")
 
@@ -191,6 +207,15 @@ class TankSimulation(QMainWindow):
             return 0.25
         else:
             return 0
+    
+    def set_pid_parameters(self, kp, ki, kd):
+        self.Kp = kp
+        self.Ki = ki
+        self.Kd = kd
+
+    def set_setpoints(self, setpoint1, setpoint2):
+        self.setpoint1 = setpoint1
+        self.setpoint2 = setpoint2
 
     def check_overflow(self):
         if self.level1 >= self.tank1_max or self.level2 >= self.tank2_max:
