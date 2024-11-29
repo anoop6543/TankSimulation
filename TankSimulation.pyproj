@@ -24,10 +24,15 @@
     <Compile Include="Archive\audiofiltest.py" />
     <Compile Include="Archive\TankSimulation.py" />
     <Compile Include="Archive\TankSimulation_Live.py" />
+    <Compile Include="GetPyOpenGL_Version.py" />
+    <Compile Include="OpneGL_Test.py" />
     <Compile Include="TankSimulation_Live_Improved.py" />
+    <Compile Include="TankSim_UserParams_3d.py" />
+    <Compile Include="UnitTests\test_tanksim_userparams_3d.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Archive\" />
+    <Folder Include="UnitTests\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Archive\test.md" />
